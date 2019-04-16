@@ -1,9 +1,9 @@
 package problem
 
 import (
-	"../estructuras/List"
 	"container/list"
 	"fmt"
+	"github.com/facuellarg/fronteir"
 )
 
 //Fail print fail if no  have solution
@@ -19,7 +19,7 @@ func NewSearchProblem(p Problem) (sh SearchProblem) {
 	return sh
 }
 
-func searchProblem(init Problem, fronteir List.Fronteir) (string, int) {
+func searchProblem(init Problem, fronteir fronteir.Fronteir) (string, int) {
 	explored := make(map[string]bool)
 	nodosExpandidos := 0
 	n := NewNode(init, "")
@@ -27,7 +27,7 @@ func searchProblem(init Problem, fronteir List.Fronteir) (string, int) {
 		return n.Path(), nodosExpandidos
 	}
 	fronteir.Add(n)
-	for !fronteir.IsEmpty() {
+	for fronteir.Size() != 0 {
 		n = fronteir.Pop().(Node)
 		nodosExpandidos++
 		explored[n.Problem().String()] = true
@@ -48,13 +48,13 @@ func searchProblem(init Problem, fronteir List.Fronteir) (string, int) {
 
 //BFS use queue in search general problem tu solved
 func (sh SearchProblem) BFS() (string, int) {
-	var queue List.Queue
+	var queue fronteir.Queue
 	return searchProblem(sh.init, &queue)
 }
 
 //DFS use stack in search general problem tu solved
 func (sh SearchProblem) DFS() (string, int) {
-	var stack List.Stack
+	var stack fronteir.Stack
 	return searchProblem(sh.init, &stack)
 }
 
