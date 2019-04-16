@@ -60,7 +60,6 @@ func (sh SearchProblem) DFS() (string, int) {
 }
 
 //LDFS Limited dfs
-//LDFS Limited dfs
 func LDFS(init Problem, limit int) (string, int) {
 	n := NewNode(init, "")
 	if n.Problem().IsGoal() {
