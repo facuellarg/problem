@@ -60,6 +60,7 @@ func (sh SearchProblem) DFS() (string, int) {
 }
 
 //LDFS Limited dfs
+//LDFS Limited dfs
 func LDFS(init Problem, limit int) (string, int) {
 	n := NewNode(init, "")
 	if n.Problem().IsGoal() {
@@ -77,9 +78,6 @@ func LDFS(init Problem, limit int) (string, int) {
 	for fronteir.Len() != 0 {
 		n = fronteir.Remove(fronteir.Back()).(Node)
 		currentDepth = depth.Remove(depth.Back()).(int)
-		if currentDepth > isInFronteir[n.Problem().String()] {
-			continue
-		}
 		nodosExpandidos++
 		delete(isInFronteir, n.Problem().String())
 		explored[n.Problem().String()] = currentDepth
@@ -88,15 +86,15 @@ func LDFS(init Problem, limit int) (string, int) {
 				child := n.Problem().Execute(action)
 				valueExplored, isExplored := explored[child.String()]
 				valueFronteir, isInF := isInFronteir[child.String()]
-				if !isInF || (isInF && valueFronteir > currentDepth) {
-					if !isExplored || (isExplored && valueExplored > currentDepth) {
+				if !isExplored || (isExplored && valueExplored > currentDepth+1) {
+					if !isInF || (isInF && valueFronteir > currentDepth+1) {
 						if child.IsGoal() {
 							return n.Path() + action, nodosExpandidos
 						}
 						fronteir.PushBack(NewNode(child, n.Path()+action+" "))
 						depth.PushBack(currentDepth + 1)
 						isInFronteir[child.String()] = currentDepth + 1
-
+						continue
 					}
 				}
 			}
