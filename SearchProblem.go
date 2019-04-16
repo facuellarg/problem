@@ -6,9 +6,10 @@ import (
 	"github.com/facuellarg/fronteir"
 )
 
-//Fail print fail if no  have solution
+//FAIL print fail if no  have solution
 const FAIL = "No hay camino"
 
+//SearchProblem struc
 type SearchProblem struct {
 	init Problem
 }
