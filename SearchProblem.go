@@ -106,7 +106,7 @@ func LDFS(init Problem, limit int) (string, int) {
 
 }
 
-//IDFS use stack in search general problem tu solved
+//IDFS usa DLS de forma iterativa para resolver el problema.
 func (sh SearchProblem) IDFS() (result string, nodos int) {
 
 	fmt.Print()
