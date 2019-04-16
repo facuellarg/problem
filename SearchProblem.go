@@ -60,7 +60,7 @@ func (sh SearchProblem) DFS() (string, int) {
 }
 
 //LDFS Limited dfs
-func LDFS(init Problem, limit int) (string, int) {
+func LDFS(init Problem, limit int, explored map[string]int) (string, int) {
 	n := NewNode(init, "")
 	if n.Problem().IsGoal() {
 		return n.Path(), 0
@@ -69,7 +69,6 @@ func LDFS(init Problem, limit int) (string, int) {
 	currentDepth := 0
 	fronteir := list.New()
 	depth := list.New()
-	explored := make(map[string]int)
 	isInFronteir := make(map[string]int)
 	fronteir.PushBack(n)
 	depth.PushBack(currentDepth)
@@ -85,7 +84,7 @@ func LDFS(init Problem, limit int) (string, int) {
 				child := n.Problem().Execute(action)
 				valueExplored, isExplored := explored[child.String()]
 				valueFronteir, isInF := isInFronteir[child.String()]
-				if !isExplored || (isExplored && valueExplored > currentDepth+1) {
+				if !isExplored || (isExplored && valueExplored >= currentDepth+1) {
 					if !isInF || (isInF && valueFronteir > currentDepth+1) {
 						if child.IsGoal() {
 							return n.Path() + action, nodosExpandidos
@@ -106,10 +105,10 @@ func LDFS(init Problem, limit int) (string, int) {
 
 //IDFS usa DLS de forma iterativa para resolver el problema.
 func (sh SearchProblem) IDFS() (result string, nodos int) {
-
 	fmt.Print()
+	explored := make(map[string]int)
 	for i := 0; i < 40; i++ {
-		result, nodos = LDFS(sh.init, i)
+		result, nodos = LDFS(sh.init, i, explored)
 		if result != FAIL {
 			fmt.Println("Altura: ", i)
 			return result, nodos
