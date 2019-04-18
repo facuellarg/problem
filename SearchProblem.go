@@ -1,9 +1,11 @@
 package problem
 
 import (
+	"container/heap"
 	"container/list"
 	"fmt"
 	"github.com/facuellarg/fronteir"
+	// "time"
 )
 
 //FAIL print fail if no  have solution
@@ -21,26 +23,65 @@ func NewSearchProblem(p Problem) (sh SearchProblem) {
 }
 
 func searchProblem(init Problem, fronteir fronteir.Fronteir) (string, int) {
-	explored := make(map[string]bool)
+	explored := make(map[string]int)
 	nodosExpandidos := 0
-	n := NewNode(init, "")
+	n := NewNode(init, "", 0)
 	if n.Problem().IsGoal() {
 		return n.Path(), nodosExpandidos
 	}
 	fronteir.Add(n)
 	for fronteir.Size() != 0 {
 		n = fronteir.Pop().(Node)
+		currentCost := n.Cost()
 		nodosExpandidos++
-		explored[n.Problem().String()] = true
+		explored[n.Problem().String()] = n.Cost()
 		for _, action := range n.Problem().PossibleActions() {
-			p := n.Problem().Execute(action)
-			if !explored[p.String()] {
-				if p.IsGoal() {
-					return n.Path() + action + " ", nodosExpandidos
+			child, cost := n.Problem().Execute(action)
+			if v, ok := explored[child.String()]; !ok || (ok && v > currentCost+cost) {
+				if child.IsGoal() {
+					return n.Path() + action, nodosExpandidos
 				}
-				fronteir.Add(NewNode(p, n.Path()+action+" "))
-
+				fronteir.Add(NewNode(child, n.Path()+action+" ", currentCost+cost))
 			}
+		}
+
+	}
+	return FAIL, nodosExpandidos
+}
+
+//SearchProblemHeuristic use heuristic to solve the problem
+func (sh SearchProblem) SearchProblemHeuristic(heuristic func(Problem) int) (string, int) {
+	explored := make(map[string]bool)
+	pq := &PriorityQueue{}
+	heap.Init(pq)
+	if sh.init.IsGoal() {
+		return "", 0
+	}
+	nodosExpandidos := 0
+	firts := NewNode(sh.init, "", 0)
+
+	heap.Push(pq, &firts)
+	for pq.Len() > 0 {
+		n := heap.Pop(pq).(*Node)
+		explored[n.Problem().String()] = true
+		currentCost := n.Cost()
+		nodosExpandidos++
+
+		// time.Sleep(time.Millisecond * 1000)
+		for _, action := range n.Problem().PossibleActions() {
+
+			child, cost := n.Problem().Execute(action)
+			if explored[child.String()] {
+				continue
+			}
+			if child.IsGoal() {
+				return n.Path() + action, nodosExpandidos
+			}
+
+			node := NewNode(child, n.Path()+action+" ", currentCost+cost)
+			node.SetRange(heuristic(child) + node.Cost())
+			heap.Push(pq, &node)
+
 		}
 
 	}
@@ -61,7 +102,7 @@ func (sh SearchProblem) DFS() (string, int) {
 
 //LDFS Limited dfs
 func LDFS(init Problem, limit int, explored map[string]int) (string, int) {
-	n := NewNode(init, "")
+	n := NewNode(init, "", 0)
 	if n.Problem().IsGoal() {
 		return n.Path(), 0
 	}
@@ -81,7 +122,7 @@ func LDFS(init Problem, limit int, explored map[string]int) (string, int) {
 		explored[n.Problem().String()] = currentDepth
 		if currentDepth < limit {
 			for _, action := range n.Problem().PossibleActions() {
-				child := n.Problem().Execute(action)
+				child, cost := n.Problem().Execute(action)
 				valueExplored, isExplored := explored[child.String()]
 				valueFronteir, isInF := isInFronteir[child.String()]
 				if !isExplored || (isExplored && valueExplored >= currentDepth+1) {
@@ -89,7 +130,7 @@ func LDFS(init Problem, limit int, explored map[string]int) (string, int) {
 						if child.IsGoal() {
 							return n.Path() + action, nodosExpandidos
 						}
-						fronteir.PushBack(NewNode(child, n.Path()+action+" "))
+						fronteir.PushBack(NewNode(child, n.Path()+action+" ", cost))
 						depth.PushBack(currentDepth + 1)
 						isInFronteir[child.String()] = currentDepth + 1
 						continue
@@ -107,7 +148,7 @@ func LDFS(init Problem, limit int, explored map[string]int) (string, int) {
 func (sh SearchProblem) IDFS() (result string, nodos int) {
 	fmt.Print()
 	explored := make(map[string]int)
-	for i := 0; i < 40; i++ {
+	for i := 0; i < 30; i++ {
 		result, nodos = LDFS(sh.init, i, explored)
 		if result != FAIL {
 			fmt.Println("Altura: ", i)

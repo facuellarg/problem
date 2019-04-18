@@ -8,8 +8,8 @@ package problem
 //this is a test
 type Problem interface {
 	IsGoal() bool
-	Execute(action string) Problem
+	Execute(action string) (Problem, int)
 	PossibleActions() []string
 	String() string
-	Childrens() []Problem
+	State() interface{}
 }
