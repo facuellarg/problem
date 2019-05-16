@@ -34,7 +34,6 @@ func (n Node) Problem() Problem {
 //Cost return the current cost until the state.
 func (n Node) Cost() int { return n.pathCost }
 
-//SetRange set the range into the node
 func (n *Node) SetRange(r int) { n.rango = r }
 
 //AddPath add a path.

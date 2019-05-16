@@ -4,6 +4,14 @@ package problem
 // 	"container/heap"
 // )
 
+// An Item is something we manage in a priority queue.
+type Item struct {
+	value    Node // The value of the item; arbitrary.
+	priority int  // The priority of the item in the queue.
+	// The index is needed by update and is maintained by the heap.Interface methods.
+	index int // The index of the item in the heap.
+}
+
 // A PriorityQueue implements heap.Interface and holds Items.
 type PriorityQueue []*Node
 
@@ -35,3 +43,10 @@ func (pq *PriorityQueue) Pop() interface{} {
 	*pq = old[0 : n-1]
 	return item
 }
+
+// // update modifies the priority and value of an Item in the queue.
+// func (pq *PriorityQueue) update(item *Item, value Node, priority int) {
+// 	item.value = value
+// 	item.priority = priority
+// 	heap.Fix(pq, item.index)
+// }

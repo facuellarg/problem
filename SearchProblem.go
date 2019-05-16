@@ -148,8 +148,10 @@ func LDFS(init Problem, limit int, explored map[string]int) (string, int) {
 func (sh SearchProblem) IDFS() (result string, nodos int) {
 	fmt.Print()
 	explored := make(map[string]int)
+	var nodosIt int
 	for i := 0; i < 30; i++ {
-		result, nodos = LDFS(sh.init, i, explored)
+		result, nodosIt = LDFS(sh.init, i, explored)
+		nodos += nodosIt
 		if result != FAIL {
 			fmt.Println("Altura: ", i)
 			return result, nodos
