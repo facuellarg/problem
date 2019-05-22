@@ -88,6 +88,45 @@ func (sh SearchProblem) SearchProblemHeuristic(heuristic func(Problem) int) (str
 	return FAIL, nodosExpandidos
 }
 
+//Greedy use heuristic to solve the problem and greedy
+func (sh SearchProblem) Greedy(heuristic func(Problem) int) (string, int) {
+	explored := make(map[string]bool)
+	pq := &PriorityQueue{}
+	heap.Init(pq)
+	if sh.init.IsGoal() {
+		return "", 0
+	}
+	nodosExpandidos := 0
+	firts := NewNode(sh.init, "", 0)
+
+	heap.Push(pq, &firts)
+	for pq.Len() > 0 {
+		n := heap.Pop(pq).(*Node)
+		explored[n.Problem().String()] = true
+		currentCost := n.Cost()
+		nodosExpandidos++
+
+		// time.Sleep(time.Millisecond * 1000)
+		for _, action := range n.Problem().PossibleActions() {
+
+			child, cost := n.Problem().Execute(action)
+			if explored[child.String()] {
+				continue
+			}
+			if child.IsGoal() {
+				return n.Path() + action, nodosExpandidos
+			}
+
+			node := NewNode(child, n.Path()+action+" ", currentCost+cost)
+			node.SetRange(heuristic(child))
+			heap.Push(pq, &node)
+
+		}
+
+	}
+	return FAIL, nodosExpandidos
+}
+
 //BFS use queue in search general problem tu solved
 func (sh SearchProblem) BFS() (string, int) {
 	var queue fronteir.Queue
@@ -149,7 +188,7 @@ func (sh SearchProblem) IDFS() (result string, nodos int) {
 	fmt.Print()
 	explored := make(map[string]int)
 	var nodosIt int
-	for i := 0; i < 30; i++ {
+	for i := 0; i < 40; i++ {
 		result, nodosIt = LDFS(sh.init, i, explored)
 		nodos += nodosIt
 		if result != FAIL {
